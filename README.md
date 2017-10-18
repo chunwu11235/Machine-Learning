@@ -1,2 +1,4 @@
 # Machine-Learning
-Some machine learning algorithms
+Some machine learning algorithms (only for myself to learn machine learning)
+
+
