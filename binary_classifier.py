@@ -42,9 +42,10 @@ class logistic(Binary_Classifier):
     '''
     def __init__(self, Data,Label):
         self.n = Data.shape[0]
-        self.Data = np.c_[np.ones(self.n), Data]
+        self.Data = Data
+        self.X = np.c_[np.ones(self.n), Data]
         self.Label = Label
-        self.p = self.Data.shape[1]
+        self.p = self.X.shape[1]
         self.theta = np.zeros( self.p )
     
     def h(X,y,theta):
@@ -62,28 +63,30 @@ class logistic(Binary_Classifier):
     def setClassifier(self, theta):
         self.theta = theta
 
-    def predict_soft(self, X_test):
-        # return Pr(Y=1|X)
-        X_test = np.c_[np.ones(X_test.shape[0]), X_test]
-        return 1.0/( 1+np.exp(-X_test.dot(self.theta)) )
+#    def predict_soft(self, X_test):
+#        # return Pr(Y=1|X)
+#        X_test = np.c_[np.ones(X_test.shape[0]), X_test]
+#        return 1.0/( 1+np.exp(-X_test.dot(self.theta)) )
 
     def predict(self, X_test):
-        return  -1*np.asarray([-1])**(self.predict_soft(X_test)-0.5 >=0)
+        X = np.c_[np.ones(X_test.shape[0]), X_test]
+        return 2*(X.dot(self.theta)>=0)-1
+#        return  -1*np.asarray([-1])**(self.predict_soft(X_test)-0.5 >=0)
         
     
 class logistic_Newton(logistic):
     def train(self, n_iter = 1000):
         for i in range(n_iter):
-            h = logistic.h(self.Data,self.Label,self.theta)
-            H = (self.Data.T).dot( np.diag( h*(1-h) ) ).dot(self.Data)/self.n
-            grad = logistic.grad(self.Data,self.Label,self.theta)
+            h = logistic.h(self.X,self.Label,self.theta)
+            H = (self.X.T).dot( np.diag( h*(1-h) ) ).dot(self.X)/self.n
+            grad = logistic.grad(self.X,self.Label,self.theta)
             self.theta -= np.linalg.inv( H ).dot( grad ) 
 
 class  logistic_GD(logistic):
     def train(self, n_iter = 1000, eta = 0.1):
         # eta is the step size used in gradient descent
         for i in range(n_iter):
-            self.theta -= eta*logistic.grad(self.Data,self.Label,self.theta)
+            self.theta -= eta*logistic.grad(self.X,self.Label,self.theta)
 
 class logistic_SGD(logistic):
     def train(self, batch_size=10 , n_iter = 1000, eta = 0.1):
@@ -91,7 +94,7 @@ class logistic_SGD(logistic):
         index_batch = np.mod(range(self.n),n_batch)
         for i in range(n_iter):
             i_batch = np.mod(i,n_batch)
-            X = self.Data[ index_batch==i_batch,:]
+            X = self.X[ index_batch==i_batch,:]
             y = self.Label[index_batch==i_batch]
             self.theta -= eta*logistic.grad(X,y,self.theta)
 
