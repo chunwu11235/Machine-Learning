@@ -2,7 +2,7 @@
 
 
 ### Ming-Chun Wu, email: chunwu@uw.edu
-### I implemente some machine learning algorithm by myself using only numpy
+### I implemented some machine learning algorithms using only numpy
 ### Contents:
 + __binary_classifier.py__: some binary classifiers including
   - logistic regression via Newton's method
